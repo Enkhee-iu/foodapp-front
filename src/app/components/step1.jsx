@@ -5,12 +5,27 @@ import { Input } from "@/components/ui/input";
 import BackButton from "./BackButton";
 import { MailIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { signUpApi } from "@/lib/api";
 
 export default function Step1({ increaseStep }) {
   const [email, setEmail] = useState("");
   const [touched, setTouched] = useState(false);
+  const [error, setError] = useState("");
 
   const validEmail = /^\S+@\S+\.\S+$/.test(email);
+
+  const handleNext = async () => {
+    setError("");
+
+    const res = await signUpApi(email);
+
+    if (res.success === false) {
+      setError(res.message);
+      return;
+    }
+
+    increaseStep();
+  };
 
   return (
     <div className="flex h-full overflow-hidden">
@@ -48,15 +63,16 @@ export default function Step1({ increaseStep }) {
           </div>
 
           <div className="h-5 mb-4">
+            {error && <p className="text-red-500 text-sm">{error}</p>}
             {!validEmail && touched && (
-              <p className="text-red-500 text-sm">
+              <p className="text-red-300 text-sm">
                 Invalid email. Use a format like example@email.com
               </p>
             )}
           </div>
 
           <Button
-            onClick={increaseStep}
+            onClick={() => increaseStep(email)}
             disabled={!validEmail}
             className={`w-[416px] h-9 mb-6 cursor-pointer
               ${

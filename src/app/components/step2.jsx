@@ -1,3 +1,133 @@
+// "use client";
+
+// import { useState } from "react";
+// import { Input } from "@/components/ui/input";
+// import { Button } from "@/components/ui/button";
+// import { Checkbox } from "@/components/ui/checkbox";
+// import BackButton from "./BackButton";
+
+// export default function Step2({ increaseStep, reduceStep }) {
+//   const [password, setPassword] = useState("");
+//   const [confirm, setConfirm] = useState("");
+//   const [show, setShow] = useState(false);
+//   const [touched, setTouched] = useState(false);
+
+//   const hasLetters = /[a-zA-Z]/.test(password);
+//   const hasNumbers = /[0-9]/.test(password);
+//   const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+
+//   let strength = "weak";
+//   if (password.length >= 8 && hasLetters && hasNumbers && hasSpecial) {
+//     strength = "strong";
+//   } else if (password.length >= 6 && hasLetters && hasNumbers) {
+//     strength = "medium";
+//   }
+
+//   const isValid = password.length >= 6 && password === confirm && hasSpecial;
+
+//   const error = touched && !isValid;
+
+//   return (
+//     <div className="flex h-screen overflow-hidden">
+//       <div className="flex items-center justify-center w-1/2">
+//         <div className="w-full max-w-[416px] mb-6">
+//           <div className="mb-6">
+//             <BackButton className="cursor-pointer" onClick={reduceStep} />
+//           </div>
+
+//           <h1 className="font-semibold text-2xl mb-2">
+//             Create a strong password
+//           </h1>
+//           <p className="text-[#71717A] mb-6">
+//             Create a strong password with letters, numbers.
+//           </p>
+
+//           <Input
+//             type={show ? "text" : "password"}
+//             placeholder="Password"
+//             className={` ${
+//               error ? "border-red-300 focus-visible:ring-red-300" : ""
+//             }`}
+//             value={password}
+//             onChange={(e) => setPassword(e.target.value)}
+//             onBlur={() => setTouched(true)}
+//           />
+
+//           <div className="relative h-5 ">
+//             {password.length > 0 && (
+//               <p
+//                 className={`absolute left-0 top-0 text-sm ${
+//                   strength === "weak"
+//                     ? "text-red-300"
+//                     : strength === "medium"
+//                     ? "text-yellow-500"
+//                     : "text-green-600"
+//                 }`}
+//               >
+//                 {strength === "weak" && "Weak password (too easy)"}
+//                 {strength === "medium" && "Medium password strength"}
+//                 {strength === "strong" && "Strong password "}
+//               </p>
+//             )}
+//           </div>
+
+//           <Input
+//             type={show ? "text" : "password"}
+//             placeholder="Confirm"
+//             className={` ${
+//               error ? "border-red-300 focus-visible:ring-red-300" : ""
+//             }`}
+//             value={confirm}
+//             onChange={(e) => setConfirm(e.target.value)}
+//             onBlur={() => setTouched(true)}
+//           />
+
+//           <div className="relative h-5 mb-4">
+//             {error && (
+//               <p className="absolute left-0 top-0 text-red-300 text-sm">
+//                 Those password did&apos;t match, Try again
+//               </p>
+//             )}
+//           </div>
+
+//           <div className="flex items-center gap-2 mb-6">
+//             <Checkbox id="show" onCheckedChange={(v) => setShow(v)} />
+//             <label
+//               htmlFor="show"
+//               className="text-sm text-gray-600 cursor-pointer"
+//             >
+//               Show password
+//             </label>
+//           </div>
+
+//           <Button
+//             onClick={increaseStep}
+//             disabled={!isValid}
+//             className={`w-full cursor-pointer mb-6 ${
+//               isValid ? "bg-black text-white" : "bg-gray-300 text-gray-500"
+//             }`}
+//           >
+//             Let&apos;s go
+//           </Button>
+
+//           <p className="text-[#71717A] text-center">
+//             Already have an account?{" "}
+//             <span className="text-[#2563EB] cursor-pointer">Log in</span>
+//           </p>
+//         </div>
+//       </div>
+
+//       <div className="w-1/2 h-full">
+//         <img
+//           src="/Delivery.svg"
+//           className="w-full h-full object-cover"
+//           alt="auth illustration"
+//         />
+//       </div>
+//     </div>
+//   );
+// }
+
 "use client";
 
 import { useState } from "react";
@@ -5,12 +135,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import BackButton from "./BackButton";
+import { signUpApi } from "@/lib/api";
 
-export default function Step2({ increaseStep, reduceStep }) {
+export default function Step2({ increaseStep, reduceStep, email, firstName }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [show, setShow] = useState(false);
   const [touched, setTouched] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const hasLetters = /[a-zA-Z]/.test(password);
   const hasNumbers = /[0-9]/.test(password);
@@ -23,30 +155,45 @@ export default function Step2({ increaseStep, reduceStep }) {
     strength = "medium";
   }
 
-  const isValid =
-    password.length >= 6 && password === confirm && hasSpecial;
-
+  const isValid = password.length >= 6 && password === confirm && hasSpecial;
   const error = touched && !isValid;
+
+  const handleFinishSignUp = async () => {
+    setErrorMsg("");
+
+    const res = await signUpApi({
+      firstName,
+      email,
+      password,
+    });
+
+    if (!res.success) {
+      setErrorMsg(res.message);
+      return;
+    }
+
+    increaseStep();
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="flex items-center justify-center w-1/2">
         <div className="w-full max-w-[416px] mb-6">
-
           <div className="mb-6">
-            <BackButton className="cursor-pointer" onClick={reduceStep} />
+            <BackButton onClick={reduceStep} />
           </div>
 
-          <h1 className="font-semibold text-2xl mb-2">Create a strong password</h1>
+          <h1 className="font-semibold text-2xl mb-2">
+            Create a strong password
+          </h1>
           <p className="text-[#71717A] mb-6">
-           Create a strong password with letters, numbers.
+            Create a strong password with letters, numbers.
           </p>
 
-       
           <Input
             type={show ? "text" : "password"}
             placeholder="Password"
-            className={` ${
+            className={`${
               error ? "border-red-300 focus-visible:ring-red-300" : ""
             }`}
             value={password}
@@ -54,11 +201,10 @@ export default function Step2({ increaseStep, reduceStep }) {
             onBlur={() => setTouched(true)}
           />
 
-     
-          <div className="relative h-5 ">
+          <div className="relative h-5">
             {password.length > 0 && (
               <p
-                className={`absolute left-0 top-0 text-sm ${
+                className={`text-sm ${
                   strength === "weak"
                     ? "text-red-300"
                     : strength === "medium"
@@ -68,18 +214,15 @@ export default function Step2({ increaseStep, reduceStep }) {
               >
                 {strength === "weak" && "Weak password (too easy)"}
                 {strength === "medium" && "Medium password strength"}
-                {strength === "strong" && "Strong password "}
+                {strength === "strong" && "Strong password"}
               </p>
             )}
-
-            
           </div>
 
-         
           <Input
             type={show ? "text" : "password"}
-            placeholder="Confirm"
-            className={` ${
+            placeholder="Confirm password"
+            className={`${
               error ? "border-red-300 focus-visible:ring-red-300" : ""
             }`}
             value={confirm}
@@ -87,32 +230,34 @@ export default function Step2({ increaseStep, reduceStep }) {
             onBlur={() => setTouched(true)}
           />
 
-      
           <div className="relative h-5 mb-4">
             {error && (
-              <p className="absolute left-0 top-0 text-red-300 text-sm">
-                Those password did't match, Try again
+              <p className="text-red-300 text-sm">
+                Those passwords didn’t match, try again
               </p>
             )}
           </div>
 
-         
           <div className="flex items-center gap-2 mb-6">
             <Checkbox id="show" onCheckedChange={(v) => setShow(v)} />
-            <label htmlFor="show" className="text-sm text-gray-600 cursor-pointer">
+            <label
+              htmlFor="show"
+              className="text-sm text-gray-600 cursor-pointer"
+            >
               Show password
             </label>
           </div>
 
-         
+          {errorMsg && <p className="text-red-500 text-sm mb-2">{errorMsg}</p>}
+
           <Button
-            onClick={increaseStep}
+            onClick={handleFinishSignUp}
             disabled={!isValid}
             className={`w-full cursor-pointer mb-6 ${
               isValid ? "bg-black text-white" : "bg-gray-300 text-gray-500"
             }`}
           >
-            Let&apos;s go
+            Finish Sign Up
           </Button>
 
           <p className="text-[#71717A] text-center">
@@ -122,7 +267,6 @@ export default function Step2({ increaseStep, reduceStep }) {
         </div>
       </div>
 
-      
       <div className="w-1/2 h-full">
         <img
           src="/Delivery.svg"
@@ -133,5 +277,3 @@ export default function Step2({ increaseStep, reduceStep }) {
     </div>
   );
 }
-
-
