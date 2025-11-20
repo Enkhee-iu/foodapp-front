@@ -17,14 +17,7 @@ export default function Step1({ increaseStep }) {
   const handleNext = async () => {
     setError("");
 
-    const res = await signUpApi(email);
-
-    if (res.success === false) {
-      setError(res.message);
-      return;
-    }
-
-    increaseStep();
+    increaseStep({ email });
   };
 
   return (
@@ -72,14 +65,11 @@ export default function Step1({ increaseStep }) {
           </div>
 
           <Button
-            onClick={() => increaseStep(email)}
+            onClick={handleNext}
             disabled={!validEmail}
             className={`w-[416px] h-9 mb-6 cursor-pointer
-              ${
-                validEmail
-                  ? "bg-[#18181B] text-white"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
+    ${validEmail ? "bg-[#18181B] text-white" : "bg-gray-300 text-gray-500"}
+  `}
           >
             Let&apos;s Go
           </Button>

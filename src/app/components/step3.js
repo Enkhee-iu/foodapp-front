@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import BackButton from "./BackButton";
-import { MailIcon } from "lucide-react"; // ← Import missing байсан
+import { MailIcon } from "lucide-react";
 
 export function Step3({ increaseStep, reduceStep }) {
   const [email, setEmail] = useState("");
@@ -17,11 +17,8 @@ export function Step3({ increaseStep, reduceStep }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-
-    
       <div className="flex items-center justify-center w-1/2">
         <div className="w-full max-w-[416px]">
-
           <div className="mb-6">
             <BackButton onClick={reduceStep} />
           </div>
@@ -34,8 +31,6 @@ export function Step3({ increaseStep, reduceStep }) {
           </div>
 
           <div className="relative mb-4">
-          
-
             <Input
               type="email"
               placeholder="Enter your email"
@@ -49,15 +44,15 @@ export function Step3({ increaseStep, reduceStep }) {
               onBlur={() => setTouched(true)}
             />
 
-              <div className="relative mb-2 h-4 ">
-  {isError && (
-    <p className="absolute left-0 top-0 text-red-500 text-sm">
-invalid email. Use a format like example@email.com    </p>
-  )}
-</div>
+            <div className="relative mb-2 h-4 ">
+              {isError && (
+                <p className="absolute left-0 top-0 text-red-500 text-sm">
+                  invalid email. Use a format like example@email.com{" "}
+                </p>
+              )}
+            </div>
           </div>
 
-         
           <Input
             type={show ? "text" : "password"}
             placeholder="Password"
@@ -69,16 +64,14 @@ invalid email. Use a format like example@email.com    </p>
             onBlur={() => setTouched(true)}
           />
 
+          <div className="relative mb-5 h-4">
+            {isError && (
+              <p className="absolute left-0 top-0 text-red-500 text-sm">
+                incorrect password. Please try again.
+              </p>
+            )}
+          </div>
 
-       <div className="relative mb-5 h-4">
-  {isError && (
-    <p className="absolute left-0 top-0 text-red-500 text-sm">
-      incorrect password. Please try again.
-    </p>
-  )}
-</div>
-
-      
           <Button
             onClick={increaseStep}
             disabled={!validEmail || isError}
@@ -92,14 +85,12 @@ invalid email. Use a format like example@email.com    </p>
           </Button>
 
           <p className="text-[#71717A] text-center">
-           Don't have an account?
+            Don&apos;t have an account?
             <span className="text-[#2563EB] cursor-pointer">Sign up</span>
           </p>
-
         </div>
       </div>
 
-      
       <div className="w-1/2 p-4 flex items-center justify-center">
         <img
           src="/Delivery.svg"
@@ -107,10 +98,8 @@ invalid email. Use a format like example@email.com    </p>
           className="w-full h-full object-cover rounded-lg"
         />
       </div>
-
     </div>
   );
 }
 
 export default Step3;
-
