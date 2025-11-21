@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import BackButton from "./BackButton";
 import { MailIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { signUpApi } from "@/lib/api"; // ← Email API-г эндээс дуудахаар байгаа
 
 export default function Step1({ increaseStep }) {
   const [email, setEmail] = useState("");
@@ -16,18 +15,22 @@ export default function Step1({ increaseStep }) {
 
   const handleNext = async () => {
     setError("");
+console.log("Step1 INCREASE email =", email);
 
     try {
-      // 🔥 Зөвхөн email-г backend рүү илгээнэ
-      const res = await signUpApi.sendEmail({ email });
+      const res = await fetch("http://localhost:999/api/auth/check-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
 
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || "Something went wrong");
+        setError(data.message || "Something went wrong");
         return;
       }
 
-      // Амжилттай бол Step2 рүү email-тай нь дамжуулна
       increaseStep({ email });
 
     } catch (err) {

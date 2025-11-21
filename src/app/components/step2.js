@@ -5,9 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import BackButton from "./BackButton";
-import { signUpApi } from "@/lib/api";
 
 export default function Step2({ increaseStep, reduceStep, email }) {
+  console.log("▶️ STEP2 RECEIVED EMAIL =", email);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [show, setShow] = useState(false);
@@ -28,20 +28,28 @@ export default function Step2({ increaseStep, reduceStep, email }) {
   const isValid = password.length >= 6 && password === confirm && hasSpecial;
   const error = touched && !isValid;
 
+  // ✅ ШИНЭ ЗӨВ SIGNUP CALL
   const handleFinishSignUp = async () => {
     setErrorMsg("");
 
-    const res = await signUpApi.finishSignup({
-      email,
-      password,
-    });
+    try {
+      const res = await fetch("http://localhost:999/api/auth/sign-up", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!res.success) {
-      setErrorMsg(res.message);
-      return;
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorMsg(data.message || "Sign up failed");
+        return;
+      }
+
+      increaseStep(); // success
+    } catch (err) {
+      setErrorMsg("Server error. Try again.");
     }
-
-    increaseStep();
   };
 
   return (
