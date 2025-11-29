@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import Avatar from "@/app/_icons/Avatar";
 import CarBlack from "@/app/_icons/Car";
 import CompanyNew from "@/app/_icons/CompanyNew";
@@ -10,80 +9,120 @@ import Plus from "@/app/_icons/Plus";
 import Sqr from "@/app/_icons/squer";
 import DishModal from "../dishmodal/DishModal";
 
+import InfoIconPencil from "@/app/_icons/InfoIcon";
+import EditDishModal from "../dishmodal/EdithDishModel";
+
 export default function Order() {
   const [categories, setCategories] = useState([]);
-  const [dishes, setDishes] = useState([]);
-  const [activeCategory, setActiveCategory] = useState(null);
   const [showDishModal, setShowDishModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(null);
+  const [showAllDishes, setShowAllDishes] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+const [selectedDish, setSelectedDish] = useState(null);
+
 
   const handleAddCategory = () => {
     if (!newCategory.trim()) return;
-    setCategories([...categories, { name: newCategory.trim() }]);
-    setActiveCategory(newCategory.trim());
+
+    setCategories([...categories, { name: newCategory.trim(), dishes: [] }]);
     setNewCategory("");
     setShowCategoryModal(false);
   };
 
   const handleDeleteCategory = (index) => {
-    const removed = categories[index].name;
-    setCategories(categories.filter((_, i) => i !== index));
-    if (activeCategory === removed) setActiveCategory(null);
+    const updated = categories.filter((_, i) => i !== index);
+    setCategories(updated);
+
+    if (activeCategoryIndex === index) setActiveCategoryIndex(null);
+  };
+
+  const handleAddDish = (newDish) => {
+    if (activeCategoryIndex === null) return;
+    const updated = [...categories];
+    updated[activeCategoryIndex].dishes.push(newDish);
+    setCategories(updated);
+    setShowDishModal(false);
   };
 
   return (
     <>
+{showEditModal && (
+  <EditDishModal
+    onClose={() => setShowEditModal(false)}
+    dish={selectedDish}
+    categories={categories}
+    onSave={(updatedDish) => {
+      const updatedCats = [...categories];
+      const { catIndex, dishIndex } = updatedDish;
+      updatedCats[catIndex].dishes[dishIndex] = updatedDish;
+      setCategories(updatedCats);
+      setShowEditModal(false);
+    }}
+  />
+)}
+
+
+      {/* CATEGORY Modal */}
       {showCategoryModal && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white w-[420px] rounded-xl p-6 shadow-xl relative">
-            <button
-              onClick={() => setShowCategoryModal(false)}
-              className="absolute right-4 top-4 text-xl text-[#4B5563] hover:text-black"
-            >
-              ✕
-            </button>
+  <div
+    className="fixed inset-0 bg-black/40 flex justify-center items-center z-50"
+    onClick={() => setShowCategoryModal(false)} // backdrop click
+  >
+    <div
+      className="bg-white p-6 rounded-xl w-[400px] relative"
+      onClick={(e) => e.stopPropagation()} // modal clicks NOT close
+    >
+      <button
+        onClick={() => setShowCategoryModal(false)}
+        className="absolute top-3 right-4"
+      >
+        ✕
+      </button>
 
-            <h1 className="text-xl font-semibold mb-5">Add new category</h1>
+      <h2 className="text-xl font-semibold mb-4">Add new category</h2>
 
-            <input
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              className="w-full border rounded-lg p-3 text-sm mb-6 outline-none"
-              placeholder="Type category name..."
-            />
+      <input
+        value={newCategory}
+        onChange={(e) => setNewCategory(e.target.value)}
+        className="border w-full rounded-lg p-3 text-sm"
+        placeholder="Category name..."
+      />
 
-            <button
-              onClick={handleAddCategory}
-              className="w-full bg-black text-white py-3 rounded-lg text-sm font-medium"
-            >
-              Add category
-            </button>
-          </div>
-        </div>
-      )}
+      <button
+        onClick={handleAddCategory}
+        className="w-full bg-black text-white rounded-lg p-3 mt-5"
+      >
+        Add Category
+      </button>
+    </div>
+  </div>
+)}
 
+
+      {/* DISH Modal */}
       {showDishModal && (
         <DishModal
           onClose={() => setShowDishModal(false)}
-          activeCategory={activeCategory}
-          dishes={dishes}
-          setDishes={setDishes}
+          onAddDish={handleAddDish}
+          categoryName={categories[activeCategoryIndex]?.name}
         />
       )}
 
-      <div className="flex gap-11 pr-10">
+      <div className="flex gap-10 pr-10">
+        {/* Sidebar */}
         <div className="w-[205px] p-9">
           <div className="flex items-center gap-2">
             <HutIcon />
-            <div className="flex flex-col">
+            <div>
               <CompanyNew />
-              <p className="text-sm text-[#71717A]">Swift delivery</p>
+              <p className="text-xs text-gray-500">Swift delivery</p>
             </div>
           </div>
 
-          <button className="w-full p-2 mt-11 bg-[#18181B] text-white rounded-full flex gap-2 justify-center">
-            <Sqr /> Food menu
+          <button className="w-full p-2 mt-10 bg-black text-white rounded-full flex gap-2 justify-center">
+            <Sqr /> Food Menu
           </button>
 
           <button className="w-full p-2 mt-4 rounded-full flex gap-2 justify-center">
@@ -91,109 +130,254 @@ export default function Order() {
           </button>
         </div>
 
+        {/* MAIN */}
         <div className="w-full mt-8">
+
           <div className="flex justify-end mb-6">
             <Avatar />
           </div>
 
-          <div className="border rounded-lg p-6 pb-10">
+          {/* Category Filter */}
+          <div className="border rounded-xl p-6 mb-6">
             <h1 className="text-xl font-semibold mb-4">Dishes category</h1>
 
             <div className="flex gap-3 flex-wrap">
+
+              {/* ALL DISHES */}
+              <div
+                onClick={() => { setShowAllDishes(true); setActiveCategoryIndex(null); }}
+                className={`px-4 py-2 rounded-full flex gap-2 cursor-pointer border
+                  ${showAllDishes
+                    ? "#E4E4E7 text-black border-[#EF4444]"
+                    : "border-#E4E4E7 text-black hover:bg-gray-50"}
+                `}
+              >
+                All dishes
+                <span className="bg-black flex items-center text-white rounded-full text-xs px-2">
+                  {categories.reduce((t, c) => t + c.dishes.length, 0)}
+                </span>
+              </div>
+
+              {/* Category pills */}
               {categories.map((cat, i) => (
                 <div
                   key={i}
-                  onClick={() => setActiveCategory(cat.name)}
-                  className={`relative px-4 py-2 border rounded-full flex gap-2 cursor-pointer 
-                    ${
-                      activeCategory === cat.name
-                        ? "bg-black text-white"
-                        : "hover:bg-gray-100"
+                  onClick={() => { setActiveCategoryIndex(i); setShowAllDishes(false); }}
+                  className={`relative px-4 py-2 rounded-full flex gap-2 cursor-pointer
+                    ${activeCategoryIndex === i && !showAllDishes
+                      ? "bg-#E4E4E7 text-black border border-[#EF4444]"
+                      : "border- text-black hover:bg-gray-50 border"
                     }`}
                 >
-                  <span className="text-sm">{cat.name}</span>
-                  <span className="text-xs bg-black text-white rounded-full px-2 py-0.5">
-                    {dishes.filter((d) => d.category === cat.name).length}
+                  {cat.name}
+                  <span className="bg-black text-white rounded-full text-xs px-2 flex  items-center">
+                    {cat.dishes.length}
                   </span>
 
+                  {/* DELETE CATEGORY */}
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteCategory(i);
-                    }}
-                    className="absolute -top-1 -right-1 w-4 h-4 bg-gray-300 rounded-full text-[10px]"
+                    onClick={(e) => { e.stopPropagation(); handleDeleteCategory(i); }}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white w-4 h-4 rounded-full text-[10px]"
                   >
                     ✕
                   </button>
                 </div>
               ))}
 
+              {/* ADD CATEGORY */}
               <button
                 onClick={() => setShowCategoryModal(true)}
-                className="w-9 h-9 bg-[#EF4444] rounded-full flex justify-center items-center text-white"
+                className="bg-red-500 w-9 h-9 rounded-full flex justify-center items-center text-white"
               >
                 <Plus />
               </button>
+
             </div>
           </div>
 
-          {activeCategory && (
-            <div className="border rounded-xl p-6 mt-6">
-              <h1 className="text-xl font-semibold mb-4">{activeCategory}</h1>
+          {/* ALL DISHES MODE */}
+          {showAllDishes && (
+            <div className="flex flex-col gap-8">
+              {categories.map((cat, i) => (
+                <div key={i} className="bg-white p-6 border rounded-xl">
 
-              <div className="grid grid-cols-4 gap-4">
-                {dishes
-                  .filter((d) => d.category === activeCategory)
-                  .map((dish, i) => (
+                  <h2 className="text-lg font-semibold mb-4">
+                    {cat.name} ({cat.dishes.length})
+                  </h2>
+
+                  <div className="grid grid-cols-6 gap-5">
+
+                    {/* ADD DISH */}
                     <div
-                      key={i}
-                      className="relative w-[270px] h-[241px] border rounded-[21px] p-3"
+                      onClick={() => {
+                        setActiveCategoryIndex(i);
+                        setShowDishModal(true);
+                      }}
+                      className="border-2 border-dashed border-red-500 rounded-xl w-[270px] h-[241px] flex justify-center items-center cursor-pointer hover:bg-red-50"
                     >
-                      <button
-                        onClick={() =>
-                          setDishes(dishes.filter((_, x) => x !== i))
-                        }
-                        className="absolute -top-1 -right-1 bg-gray-300 rounded-full w-5 h-5 text-[10px]"
-                      >
-                        ✕
-                      </button>
-
-                      {dish.image && (
-                        <img
-                          src={dish.image}
-                          className="w-full h-24 object-cover rounded-lg mb-2"
-                        />
-                      )}
-
-                      <p className="font-semibold">{dish.name}</p>
-                      <p className="text-xs text-gray-500 mb-1">
-                        {dish.ingredients}
-                      </p>
-                      <p className="text-sm font-semibold">${dish.price}</p>
+                      <div className="text-center">
+                     <button
+  className="h-8 w-8 bg-red-500 text-white rounded-full mx-auto
+             flex items-center justify-center text-center
+             leading-none"
+>
+  <Plus className="m-0 p-0" />
+</button>
+                        <p className="text-xs mt-2">Add new Dish to {cat.name}</p>
+                      </div>
                     </div>
-                  ))}
+
+                    {/* Dish Cards */}
+                    {cat.dishes.map((dish, dIndex) => (
+                      <div key={dIndex} className="relative border rounded-xl p-3 w-[270px] h-[241px] shadow">
+
+                        {/* DELETE DISH */}
+                        <button
+                          onClick={() => {
+                            const updated = [...categories];
+                            updated[i].dishes = updated[i].dishes.filter((_, idx) => idx !== dIndex);
+                            setCategories(updated);
+                          }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full text-[10px]"
+                        >
+                          ✕
+                        </button>
+
+                  <div className="relative h-[129px] w-full">
+  <img
+    src={dish.image}
+    className="h-full w-full rounded-lg object-cover"
+  />
+   <button
+  onClick={() => {
+    setSelectedDish({
+      ...dish,
+      category: cat.name, // 👈 i байхгүй тул cat.name-аас category авна
+      catIndex: categories.indexOf(cat), // 👈 i-г олж байна
+      dishIndex: dIndex,
+    });
+    setShowEditModal(true);
+  }}
+  className={`
+    absolute bottom-3 right-3
+    bg-white hover:bg-gray-200
+    rounded-full flex justify-center items-center
+    w-[32px] h-[32px]
+    z-50
+    ${showDishModal ? "hidden" : ""}
+  `}
+>
+  <InfoIconPencil className="w-[18px] h-[18px] stroke-red-500" />
+</button>
+</div>
+
+
+                        <div className="flex justify-between mb-1">
+                          <p className="font-semibold text-red-500 line-clamp-2 w-[150px]">{dish.name}</p>
+                          <p className="font-bold text-sm">${Number(dish.price).toFixed(2)}</p>
+                        </div>
+
+                        <p className="text-xs text-gray-500 line-clamp-3">{dish.ingredients}</p>
+                      </div>
+                    ))}
+
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* SINGLE CATEGORY VIEW */}
+          {!showAllDishes && activeCategoryIndex !== null && (
+            <div className="bg-white p-6 border rounded-xl mb-8">
+              <h2 className="text-lg font-semibold mb-4">
+                {categories[activeCategoryIndex].name} ({categories[activeCategoryIndex].dishes.length})
+              </h2>
+
+              <div className="grid grid-cols-6 gap-5">
 
                 {/* ADD DISH */}
                 <div
-                  className="w-[270px] h-[241px] border-2 border-dashed border-[#EF4444] rounded-[21px] flex items-center justify-center cursor-pointer"
                   onClick={() => setShowDishModal(true)}
+                  className="border-2 border-dashed border-red-500 rounded-xl w-[270px] h-[241px] flex justify-center items-center cursor-pointer hover:bg-red-50"
                 >
-                  <div className="text-center">
-                    <button className="w-8 h-8 bg-[#EF4444] text-white rounded-full mx-auto flex items-center justify-center">
-                      <Plus />
-                    </button>
-                    <p className="text-xs mt-2">
-                      Add new Dish to {activeCategory}
-                    </p>
+                  <div className="text-center ">
+                    
+                   <button className="h-8 w-8 bg-red-500 text-white rounded-full mx-auto flex items-center justify-center">
+  <Plus />
+</button>
+
+                    
+                    <p className="text-xs mt-2">Add new Dish to {categories[activeCategoryIndex].name}</p>
                   </div>
                 </div>
+
+                {/* Dish Cards */}
+                {categories[activeCategoryIndex].dishes.map((dish, dIndex) => (
+                  <div key={dIndex} className="relative border rounded-xl p-3 w-[270px] h-[241px] shadow">
+                    <button
+                      onClick={() => {
+                        const updated = [...categories];
+                        updated[activeCategoryIndex].dishes =
+                          updated[activeCategoryIndex].dishes.filter((_, idx) => idx !== dIndex);
+                        setCategories(updated);
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full text-[10px]"
+                    >
+                      ✕
+                    </button>
+
+
+                 <div className="relative h-[129px] w-full">
+  <img
+    src={dish.image}
+    className="h-full w-full rounded-lg object-cover"
+  />
+   <button
+  onClick={() => {
+    setSelectedDish({
+      ...dish,
+     category: cat.name, // 👈 i байхгүй тул cat.name-аас category авна
+      catIndex: categories.indexOf(cat), // 👈 i-г олж байна
+      dishIndex: dIndex,
+    });
+    setShowEditModal(true);
+  }}
+  className={`
+    absolute bottom-3 right-3
+    bg-white hover:bg-gray-200
+    rounded-full flex justify-center items-center
+    w-[32px] h-[32px]
+    z-50
+    ${showDishModal ? "hidden" : ""}
+  `}
+>
+  <InfoIconPencil className="w-[18px] h-[18px] stroke-red-500" />
+</button>
+</div>
+
+
+
+
+
+
+
+
+
+
+                    <div className="flex justify-between mb-1">
+                      <p className="font-semibold text-red-500 line-clamp-2 w-[150px]">{dish.name}</p>
+                      <p className="font-bold text-sm">${Number(dish.price).toFixed(2)}</p>
+                    </div>
+
+                    <p className="text-xs text-gray-500 line-clamp-3">{dish.ingredients}</p>
+                  </div>
+                ))}
+
               </div>
             </div>
           )}
 
-          {!activeCategory && (
-            <p className="text-gray-400 text-sm mt-6">Choose a category</p>
-          )}
         </div>
       </div>
     </>

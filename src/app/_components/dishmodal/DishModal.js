@@ -1,35 +1,24 @@
 "use client";
 import { useState } from "react";
 
-export default function DishModal({
-  onClose,
-  activeCategory,
-  dishes,
-  setDishes,
-}) {
+export default function DishModal({ onClose, onAddDish, categoryName }) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [image, setImage] = useState(null);
 
-  const handleAddDish = () => {
+  const handleSubmit = () => {
     if (!name.trim() || !price.trim()) return;
 
-    setDishes([
-      ...dishes,
-      {
-        name,
-        price,
-        ingredients,
-        image,
-        category: activeCategory,
-      },
-    ]);
+    const newDish = {
+      name,
+      price,
+      ingredients,
+      image,
+      category: categoryName,
+    };
 
-    setName("");
-    setPrice("");
-    setIngredients("");
-    setImage(null);
+    onAddDish(newDish);
     onClose();
   };
 
@@ -41,49 +30,44 @@ export default function DishModal({
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div className="bg-white w-[550px] rounded-xl p-6 shadow-xl relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-[18px] text-gray-500 hover:text-black"
-        >
+        <button onClick={onClose} className="absolute top-4 right-4 text-[18px] text-gray-500 hover:text-black">
           ✕
         </button>
 
         <h1 className="text-lg font-semibold mb-5">
-          Add new Dish to {activeCategory}
+          Add new Dish to {categoryName}
         </h1>
 
+        {/* Name + Price */}
         <div className="flex gap-4 mb-3">
           <div className="flex-1">
             <p className="text-sm text-gray-600 mb-1">Food name</p>
-            <input
+            <input className="w-full border rounded-lg p-3 text-sm"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border rounded-lg p-3 text-sm outline-none"
               placeholder="Dish name..."
             />
           </div>
-
           <div className="w-[120px]">
             <p className="text-sm text-gray-600 mb-1">Food price</p>
-            <input
+            <input className="w-full border rounded-lg p-3 text-sm"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full border rounded-lg p-3 text-sm outline-none"
               placeholder="$0.00"
             />
           </div>
         </div>
 
+        {/* Ingredients */}
         <p className="text-sm text-gray-600 mb-1">Ingredients</p>
-        <textarea
+        <textarea className="border rounded-lg w-full h-20 p-3 text-sm mb-4"
           value={ingredients}
           onChange={(e) => setIngredients(e.target.value)}
-          className="w-full border rounded-lg p-3 h-[72px] text-sm outline-none mb-4"
           placeholder="Write ingredients..."
         />
 
+        {/* Image Upload */}
         <p className="text-sm text-gray-600 mb-1">Food image</p>
-
         <label className="cursor-pointer block border-2 border-dashed rounded-lg h-[120px] flex items-center justify-center overflow-hidden">
           {image ? (
             <img src={image} className="w-full h-full object-cover" />
@@ -93,8 +77,7 @@ export default function DishModal({
           <input type="file" className="hidden" onChange={handleImageUpload} />
         </label>
 
-        <button
-          onClick={handleAddDish}
+        <button onClick={handleSubmit}
           className="mt-5 w-full bg-black text-white py-3 rounded-lg text-sm font-medium"
         >
           Add Dish
@@ -103,3 +86,4 @@ export default function DishModal({
     </div>
   );
 }
+
