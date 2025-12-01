@@ -30,7 +30,10 @@ export default function DishModal({ onClose, onAddDish, categoryName }) {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div className="bg-white w-[550px] rounded-xl p-6 shadow-xl relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-[18px] text-gray-500 hover:text-black">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-[18px] text-gray-500 hover:text-black"
+        >
           ✕
         </button>
 
@@ -38,11 +41,11 @@ export default function DishModal({ onClose, onAddDish, categoryName }) {
           Add new Dish to {categoryName}
         </h1>
 
-        {/* Name + Price */}
         <div className="flex gap-4 mb-3">
           <div className="flex-1">
             <p className="text-sm text-gray-600 mb-1">Food name</p>
-            <input className="w-full border rounded-lg p-3 text-sm"
+            <input
+              className="w-full border rounded-lg p-3 text-sm"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Dish name..."
@@ -50,7 +53,8 @@ export default function DishModal({ onClose, onAddDish, categoryName }) {
           </div>
           <div className="w-[120px]">
             <p className="text-sm text-gray-600 mb-1">Food price</p>
-            <input className="w-full border rounded-lg p-3 text-sm"
+            <input
+              className="w-full border rounded-lg p-3 text-sm"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="$0.00"
@@ -58,15 +62,14 @@ export default function DishModal({ onClose, onAddDish, categoryName }) {
           </div>
         </div>
 
-        {/* Ingredients */}
         <p className="text-sm text-gray-600 mb-1">Ingredients</p>
-        <textarea className="border rounded-lg w-full h-20 p-3 text-sm mb-4"
+        <textarea
+          className="border rounded-lg w-full h-20 p-3 text-sm mb-4"
           value={ingredients}
           onChange={(e) => setIngredients(e.target.value)}
           placeholder="Write ingredients..."
         />
 
-        {/* Image Upload */}
         <p className="text-sm text-gray-600 mb-1">Food image</p>
         <label className="cursor-pointer block border-2 border-dashed rounded-lg h-[120px] flex items-center justify-center overflow-hidden">
           {image ? (
@@ -77,7 +80,8 @@ export default function DishModal({ onClose, onAddDish, categoryName }) {
           <input type="file" className="hidden" onChange={handleImageUpload} />
         </label>
 
-        <button onClick={handleSubmit}
+        <button
+          onClick={handleSubmit}
           className="mt-5 w-full bg-black text-white py-3 rounded-lg text-sm font-medium"
         >
           Add Dish
@@ -86,4 +90,3 @@ export default function DishModal({ onClose, onAddDish, categoryName }) {
     </div>
   );
 }
-
