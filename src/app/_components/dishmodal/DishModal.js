@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import axios from "axios";
 
 export default function DishModal({ onClose, onAddDish, categoryName }) {
   const [name, setName] = useState("");
@@ -22,9 +23,28 @@ export default function DishModal({ onClose, onAddDish, categoryName }) {
     onClose();
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) setImage(URL.createObjectURL(file));
+    if (!file) return;
+
+    // preview
+    setImage(URL.createObjectURL(file));
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      try {
+        const base64 = reader.result;
+        const res = await axios.post("http://localhost:999/api/upload", {
+          data: base64,
+        });
+
+        setImage(res.data.url); // Cloudinary URL-р солих
+      } catch (err) {
+        console.log("Upload error", err);
+        alert("Upload failed");
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   return (

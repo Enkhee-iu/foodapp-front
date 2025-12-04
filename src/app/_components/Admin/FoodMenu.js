@@ -11,6 +11,7 @@ import DishModal from "../dishmodal/DishModal";
 import InfoIconPencil from "@/app/_icons/InfoIcon";
 import EditDishModal from "../dishmodal/EdithDishModel";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export default function Order() {
   const [showDishModal, setShowDishModal] = useState(false);
@@ -48,6 +49,14 @@ export default function Order() {
     setNewCategories([...newCategories, createdCategory]);
     setNewCategory("");
     setShowCategoryModal(false);
+
+    toast.success("New Category is being added to the menu", {
+      duration: 2500,
+      style: {
+        background: "#111",
+        color: "#fff",
+      },
+    });
   };
 
   const handleDeleteCategory = async (index) => {
@@ -84,8 +93,18 @@ export default function Order() {
 
       setNewCategories(updated);
       setShowDishModal(false);
+
+      toast.success("New dish is being added to menu", {
+        duration: 2500,
+        style: {
+          background: "#111",
+          color: "#fff",
+        },
+      });
     } catch (err) {
       console.log("Dish add error:", err.response?.data || err);
+
+      toast.error("Failed to add dish!");
     }
   };
 
