@@ -7,15 +7,17 @@ export default function DishModal({ onClose, onAddDish, categoryName }) {
   const [price, setPrice] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [image, setImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleSubmit = () => {
     if (!name.trim() || !price.trim()) return;
+    if (!image) return alert("Please wait until image uploads!");
 
     const newDish = {
       name,
       price,
       ingredients,
-      image,
+      image, // ❗Cloudinary URL энд байна
       category: categoryName,
     };
 
@@ -27,21 +29,24 @@ export default function DishModal({ onClose, onAddDish, categoryName }) {
     const file = e.target.files[0];
     if (!file) return;
 
-    // preview
+    // Preview
     setImage(URL.createObjectURL(file));
 
     const reader = new FileReader();
     reader.onloadend = async () => {
+      setUploading(true);
       try {
         const base64 = reader.result;
         const res = await axios.post("http://localhost:999/api/upload", {
           data: base64,
         });
 
-        setImage(res.data.url); // Cloudinary URL-р солих
+        setImage(res.data.url); // ✔ Cloudinary URL боллоо
       } catch (err) {
         console.log("Upload error", err);
         alert("Upload failed");
+      } finally {
+        setUploading(false);
       }
     };
     reader.readAsDataURL(file);
@@ -95,16 +100,19 @@ export default function DishModal({ onClose, onAddDish, categoryName }) {
           {image ? (
             <img src={image} className="w-full h-full object-cover" />
           ) : (
-            <p className="text-gray-400 text-sm">Upload image</p>
+            <p className="text-gray-400 text-sm">
+              {uploading ? "Uploading..." : "Upload image"}
+            </p>
           )}
           <input type="file" className="hidden" onChange={handleImageUpload} />
         </label>
 
         <button
           onClick={handleSubmit}
-          className="mt-5 w-full bg-black text-white py-3 rounded-lg text-sm font-medium"
+          disabled={uploading}
+          className="mt-5 w-full bg-black text-white py-3 rounded-lg text-sm font-medium disabled:bg-gray-400"
         >
-          Add Dish
+          {uploading ? "Uploading image..." : "Add Dish"}
         </button>
       </div>
     </div>
