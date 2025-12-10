@@ -6,9 +6,11 @@ import FoodDetailModal from "../_components/dishmodal/FoodDetailModal";
 import Toast from "../_components/Toast/Toast";
 import CartDrawer from "../_components/CardDrawer/CartDrawer";
 import SuccessOrderModal from "../_components/SuccessOrderModal/SuccessOrderModal";
-import LoginModal from "../_components/LoginModal/LoginModal";
+
+import { useRouter } from "next/navigation";
 
 export default function MainPage() {
+  const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [selectedDish, setSelectedDish] = useState(null);
   const [showToast, setShowToast] = useState(false);
@@ -17,15 +19,32 @@ export default function MainPage() {
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [orders, setOrders] = useState([]);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!user) {
+      localStorage.setItem("isCartOpen", "true");
       setShowLoginModal(true);
       return;
     }
 
-    setCart([]);
-    setShowSuccess(true);
+    try {
+      await axios.post("http://localhost:999/api/orders", {
+        userId: user.id,
+        items: cart,
+        totalPrice: itemsTotal + shippingFee,
+        status: "Pending",
+      });
+
+      setCart([]);
+      localStorage.setItem("cart", "[]");
+
+      fetchOrders();
+
+      setShowSuccess(true);
+    } catch (error) {
+      console.log("Order save error:", error);
+    }
   };
 
   const getCategories = async () => {
@@ -37,13 +56,52 @@ export default function MainPage() {
     }
   };
 
+  const fetchOrders = async () => {
+    try {
+      const res = await axios.get("http://localhost:999/api/orders");
+      console.log("ORDERS API RESPONSE ===>", res.data);
+      setOrders(res.data.data);
+    } catch (err) {
+      console.log("Order fetch error:", err);
+    }
+  };
+
   useEffect(() => {
     getCategories();
+
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      fetchOrders();
+    }
+  }, []);
+
+  useEffect(() => {
+    getCategories();
+
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+
+    const savedCart = localStorage.getItem("cart");
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+
+    const savedCartOpen = localStorage.getItem("isCartOpen");
+    if (savedCartOpen === "true") {
+      setIsCartOpen(true);
+    }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
+
+  useEffect(() => {
+    localStorage.setItem("isCartOpen", isCartOpen ? "true" : "false");
+  }, [isCartOpen]);
 
   const handleAddToCart = (dish, count) => {
     console.log("Cart ➕", dish.foodName || dish.name, "qty:", count);
@@ -97,7 +155,27 @@ export default function MainPage() {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  console.log("CART FROM MAINPAGE", cart);
+  useEffect(() => {
+    setOrders([
+      {
+        id: "20156",
+        total: 26.97,
+        status: "Pending",
+        date: "2024/12/20",
+        items: [
+          { name: "Sunshine Stackers", quantity: 1 },
+          { name: "Sunshine Stackers", quantity: 1 },
+        ],
+      },
+      {
+        id: "20157",
+        total: 12.99,
+        status: "Delivered",
+        date: "2024/12/20",
+        items: [{ name: "Sunshine Stackers", quantity: 1 }],
+      },
+    ]);
+  }, []);
 
   return (
     <div>
@@ -172,18 +250,29 @@ export default function MainPage() {
       <CartDrawer
         isOpen={isCartOpen}
         cartItems={cart}
-        onClose={() => setIsCartOpen(false)}
+        onClose={() => {
+          setIsCartOpen(false);
+          localStorage.setItem("isCartOpen", "false");
+        }}
         onUpdateQty={handleUpdateQty}
         onRemoveItem={handleRemoveItem}
         onCheckout={handleCheckout}
+        orders={orders}
       />
 
-      {showLoginModal && (
-        <LoginModal onClose={() => setShowLoginModal(false)} />
-      )}
-
       {showSuccess && (
-        <SuccessOrderModal onClose={() => setShowSuccess(false)} />
+        <SuccessOrderModal
+          onClose={() => {
+            setShowSuccess(false);
+            setCart([]);
+            localStorage.setItem("cart", "[]");
+
+            setIsCartOpen(false);
+            localStorage.setItem("isCartOpen", "false");
+
+            router.push("/");
+          }}
+        />
       )}
     </div>
   );

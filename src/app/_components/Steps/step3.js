@@ -47,6 +47,15 @@ export default function Step3({ reduceStep }) {
     }
   };
 
+  const handleLoginSuccess = (userData) => {
+    localStorage.setItem("user", JSON.stringify(userData));
+
+    const redirectPath = localStorage.getItem("redirectTo") || "/";
+    localStorage.removeItem("redirectTo");
+
+    window.location.href = redirectPath;
+  };
+
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="flex items-center justify-center w-1/2 bg-white">
