@@ -5,7 +5,7 @@ import Purchase from "../_icons/Purchase";
 import Right from "../_icons/Right";
 import { UserIcon } from "../_icons/UserIcon";
 
-export default function Header() {
+export default function Header({ openCart }) {
   return (
     <div className="w-full bg-[#18181B] h-[68px] flex justify-center">
       <div className="w-full max-w-[1440px] h-full flex justify-between items-center px-[88px]">
@@ -30,7 +30,10 @@ export default function Header() {
             <Right className="ml-2" />
           </div>
 
-          <div className="rounded-[50px] bg-white w-9 h-9 flex items-center justify-center">
+          <div
+            onClick={openCart}
+            className="rounded-[50px] bg-white w-9 h-9 flex items-center justify-center cursor-pointer"
+          >
             <Purchase />
           </div>
 

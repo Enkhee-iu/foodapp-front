@@ -9,13 +9,12 @@ import SuccessOrderModal from "../_components/SuccessOrderModal/SuccessOrderModa
 
 import { useRouter } from "next/navigation";
 
-export default function MainPage() {
+export default function MainPage({ isCartOpen, openCart, closeCart }) {
   const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [selectedDish, setSelectedDish] = useState(null);
   const [showToast, setShowToast] = useState(false);
   const [cart, setCart] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -72,26 +71,11 @@ export default function MainPage() {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-      fetchOrders();
-    }
-  }, []);
-
-  useEffect(() => {
-    getCategories();
-
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
     }
 
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       setCart(JSON.parse(savedCart));
-    }
-
-    const savedCartOpen = localStorage.getItem("isCartOpen");
-    if (savedCartOpen === "true") {
-      setIsCartOpen(true);
     }
   }, []);
 
@@ -139,7 +123,7 @@ export default function MainPage() {
       ];
     });
 
-    setIsCartOpen(true);
+    openCart();
   };
 
   const handleUpdateQty = (id, newQty) => {
@@ -158,21 +142,32 @@ export default function MainPage() {
   useEffect(() => {
     setOrders([
       {
-        id: "20156",
-        total: 26.97,
-        status: "Pending",
-        date: "2024/12/20",
-        items: [
-          { name: "Sunshine Stackers", quantity: 1 },
-          { name: "Sunshine Stackers", quantity: 1 },
+        _id: "20156",
+        totalPrice: 26.97,
+        status: "pending",
+        createdAt: "2024-12-20T10:00:00Z",
+        foodOrderItems: [
+          {
+            food: { name: "Sunshine Stackers" },
+            quantity: 1,
+          },
+          {
+            food: { name: "Sunshine Stackers" },
+            quantity: 1,
+          },
         ],
       },
       {
-        id: "20157",
-        total: 12.99,
-        status: "Delivered",
-        date: "2024/12/20",
-        items: [{ name: "Sunshine Stackers", quantity: 1 }],
+        _id: "20157",
+        totalPrice: 12.99,
+        status: "delivered",
+        createdAt: "2024-12-20T10:00:00Z",
+        foodOrderItems: [
+          {
+            food: { name: "Sunshine Stackers" },
+            quantity: 1,
+          },
+        ],
       },
     ]);
   }, []);
@@ -250,10 +245,7 @@ export default function MainPage() {
       <CartDrawer
         isOpen={isCartOpen}
         cartItems={cart}
-        onClose={() => {
-          setIsCartOpen(false);
-          localStorage.setItem("isCartOpen", "false");
-        }}
+        onClose={closeCart}
         onUpdateQty={handleUpdateQty}
         onRemoveItem={handleRemoveItem}
         onCheckout={handleCheckout}
