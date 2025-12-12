@@ -12,6 +12,9 @@ import InfoIconPencil from "@/app/_icons/InfoIcon";
 import EditDishModal from "../dishmodal/EdithDishModel";
 import axios from "axios";
 import toast from "react-hot-toast";
+import SqrWhite from "@/app/_icons/sqrblack";
+import CarWhiteIcon from "@/app/_icons/CarWhiteIcon";
+import OrdersPage from "./OrderMenu";
 
 export default function Order() {
   const [showDishModal, setShowDishModal] = useState(false);
@@ -21,7 +24,7 @@ export default function Order() {
   const [showAllDishes, setShowAllDishes] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedDish, setSelectedDish] = useState(null);
-
+  const [activeTab, setActiveTab] = useState("FoodMenu");
   const [newCategories, setNewCategories] = useState([]);
 
   const getCategories = async () => {
@@ -127,213 +130,236 @@ export default function Order() {
 
   return (
     <>
-      {showEditModal && selectedDish && (
-        <EditDishModal
-          onClose={() => setShowEditModal(false)}
-          dish={selectedDish}
-          categories={newCategories}
-          onSave={(updatedDish) => {
-            const updated = [...newCategories];
-            updated[updatedDish.catIndex].dishes[updatedDish.dishIndex] =
-              updatedDish;
-            setNewCategories(updated);
-            setShowEditModal(false);
-          }}
-          onDeleteDish={handleDeleteDish}
-        />
-      )}
-
-      {showCategoryModal && (
-        <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl w-[400px] relative">
-            <button
-              onClick={() => setShowCategoryModal(false)}
-              className="absolute top-3 right-4 cursor-pointer"
-            >
-              ✕
-            </button>
-
-            <h2 className="text-xl font-semibold mb-4">Add new category</h2>
-
-            <input
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              className="border w-full rounded-lg p-3 text-sm"
-              placeholder="Category name..."
+      {activeTab === "FoodMenu" && (
+        <>
+          {showEditModal && selectedDish && (
+            <EditDishModal
+              onClose={() => setShowEditModal(false)}
+              dish={selectedDish}
+              categories={newCategories}
+              onSave={(updatedDish) => {
+                const updated = [...newCategories];
+                updated[updatedDish.catIndex].dishes[updatedDish.dishIndex] =
+                  updatedDish;
+                setNewCategories(updated);
+                setShowEditModal(false);
+              }}
+              onDeleteDish={handleDeleteDish}
             />
+          )}
 
-            <button
-              onClick={handleAddCategory}
-              className="w-full bg-black text-white rounded-lg p-3 mt-5"
-            >
-              Add Category
-            </button>
-          </div>
-        </div>
-      )}
+          {showCategoryModal && (
+            <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+              <div className="bg-white p-6 rounded-xl w-[400px] relative">
+                <button
+                  onClick={() => setShowCategoryModal(false)}
+                  className="absolute top-3 right-4 cursor-pointer"
+                >
+                  ✕
+                </button>
 
-      {showDishModal && activeCategoryIndex !== null && (
-        <DishModal
-          onClose={() => setShowDishModal(false)}
-          onAddDish={handleAddDish}
-          categoryName={
-            newCategories[activeCategoryIndex]?.categoryName || "Category"
-          }
-        />
-      )}
+                <h2 className="text-xl font-semibold mb-4">Add new category</h2>
 
-      <div className="mx-auto w-full max-w-[1440px] px-4 md:px-8 flex gap-10 pr-10">
-        <div className="w-[205px] p-9">
-          <div className="flex items-center gap-2">
-            <HutIcon />
-            <div>
-              <CompanyNew />
-              <p className="text-xs text-gray-500">Swift delivery</p>
+                <input
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  className="border w-full rounded-lg p-3 text-sm"
+                  placeholder="Category name..."
+                />
+
+                <button
+                  onClick={handleAddCategory}
+                  className="w-full bg-black text-white rounded-lg p-3 mt-5"
+                >
+                  Add Category
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
-          <button className="w-full p-2 mt-10 bg-black text-white rounded-full flex gap-2 justify-center">
-            <Sqr /> Food Menu
-          </button>
+          {showDishModal && activeCategoryIndex !== null && (
+            <DishModal
+              onClose={() => setShowDishModal(false)}
+              onAddDish={handleAddDish}
+              categoryName={
+                newCategories[activeCategoryIndex]?.categoryName || "Category"
+              }
+            />
+          )}
 
-          <button className="w-full p-2 mt-4 rounded-full flex gap-2 justify-center">
-            <CarBlack /> Orders
-          </button>
-        </div>
+          <div className="mx-auto w-full max-w-[1440px] px-4 md:px-8 flex gap-10 pr-10">
+            <div className="w-[205px] p-9">
+              <div className="flex items-center gap-2">
+                <HutIcon />
+                <div>
+                  <CompanyNew />
+                  <p className="text-xs text-gray-500">Swift delivery</p>
+                </div>
+              </div>
 
-        <div className="w-full mt-8">
-          <div className="flex justify-end mb-6">
-            <Avatar />
-          </div>
-
-          <div className="border rounded-xl p-6 mb-6">
-            <h1 className="text-xl font-semibold mb-4">Dishes category</h1>
-
-            <div className="flex gap-3 flex-wrap">
               <button
-                onClick={() => {
-                  setShowAllDishes(true);
-                  setActiveCategoryIndex(null);
-                }}
-                className={`px-4 py-2 rounded-full flex gap-2 cursor-pointer border
+                onClick={() => setActiveTab("FoodMenu")}
+                className={`w-full p-2 mt-10 cursor-pointer rounded-full flex gap-2 justify-center items-center ${
+                  activeTab === "FoodMenu"
+                    ? "bg-black text-white"
+                    : "bg-gray-200 text-black"
+                }`}
+              >
+                {activeTab === "FoodMenu" ? <Sqr /> : <SqrWhite />}
+                Food Menu
+              </button>
+
+              <button
+                onClick={() => setActiveTab("OrderMenu")}
+                className={`w-full p-2 mt-4 cursor-pointer rounded-full flex gap-2 justify-center items-center ${
+                  activeTab === "OrderMenu"
+                    ? "bg-black text-white"
+                    : "bg-gray-200 text-black"
+                }`}
+              >
+                {activeTab === "OrderMenu" ? <CarWhiteIcon /> : <CarBlack />}
+                Orders
+              </button>
+            </div>
+
+            <div className="w-full mt-8">
+              <div className="flex justify-end mb-6">
+                <Avatar />
+              </div>
+
+              <div className="border rounded-xl p-6 mb-6">
+                <h1 className="text-xl font-semibold mb-4">Dishes category</h1>
+
+                <div className="flex gap-3 flex-wrap">
+                  <button
+                    onClick={() => {
+                      setShowAllDishes(true);
+                      setActiveCategoryIndex(null);
+                    }}
+                    className={`px-4 py-2 rounded-full flex gap-2 cursor-pointer border
     ${showAllDishes ? "border-[#EF4444] " : "border-gray-300 hover:bg-gray-100"}
   `}
-              >
-                All dishes
-                <span className="bg-black text-white rounded-full text-xs px-2 flex items-center">
-                  {newCategories.reduce(
-                    (t, c) => t + (c.dishes?.length || 0),
-                    0
-                  )}
-                </span>
-              </button>
-
-              {newCategories.map((category, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    setActiveCategoryIndex(index);
-                    setShowAllDishes(false);
-                  }}
-                  className={`relative px-4 py-2 rounded-full flex gap-2 cursor-pointer border ${
-                    activeCategoryIndex === index && !showAllDishes
-                      ? "border-[#EF4444]"
-                      : "hover:bg-gray-50"
-                  }`}
-                >
-                  {category.categoryName}
-                  <span className="bg-black text-white rounded-full text-xs px-2 flex items-center">
-                    {category.dishes?.length || 0}
-                  </span>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteCategory(index);
-                    }}
-                    className="absolute -top-2 -right-2 bg-gray-200 text-black w-4 h-4 rounded-full text-[10px]"
                   >
-                    ✕
+                    All dishes
+                    <span className="bg-black text-white rounded-full text-xs px-2 flex items-center">
+                      {newCategories.reduce(
+                        (t, c) => t + (c.dishes?.length || 0),
+                        0
+                      )}
+                    </span>
                   </button>
-                </div>
-              ))}
 
-              <button
-                onClick={() => setShowCategoryModal(true)}
-                className="bg-red-500 w-9 h-9 rounded-full flex justify-center items-center text-white"
-              >
-                <Plus />
-              </button>
-            </div>
-          </div>
-
-          <div className="grid gap-8">
-            {(showAllDishes
-              ? newCategories
-              : [newCategories[activeCategoryIndex]]
-            )
-              .filter(Boolean)
-              .map((cat, i) => (
-                <div key={i} className="bg-white p-6 border rounded-xl">
-                  <h2 className="text-lg font-semibold mb-4">
-                    {cat.categoryName} ({cat.dishes?.length || 0})
-                  </h2>
-
-                  <div className="grid grid-cols-4 gap-5">
+                  {newCategories.map((category, index) => (
                     <div
+                      key={index}
                       onClick={() => {
-                        setActiveCategoryIndex(i);
-                        setShowDishModal(true);
+                        setActiveCategoryIndex(index);
+                        setShowAllDishes(false);
                       }}
-                      className="border-2 border-dashed border-red-500 rounded-xl w-[270px] h-[241px] flex justify-center items-center hover:bg-red-50 cursor-pointer"
+                      className={`relative px-4 py-2 rounded-full flex gap-2 cursor-pointer border ${
+                        activeCategoryIndex === index && !showAllDishes
+                          ? "border-[#EF4444]"
+                          : "hover:bg-gray-50"
+                      }`}
                     >
-                      <button className="bg-red-500 w-9 cursor-pointer h-9 rounded-full flex justify-center items-center text-white">
-                        <Plus />
+                      {category.categoryName}
+                      <span className="bg-black text-white rounded-full text-xs px-2 flex items-center">
+                        {category.dishes?.length || 0}
+                      </span>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteCategory(index);
+                        }}
+                        className="absolute -top-2 -right-2 bg-gray-200 text-black w-4 h-4 rounded-full text-[10px]"
+                      >
+                        ✕
                       </button>
                     </div>
+                  ))}
 
-                    {cat.dishes?.map((dish, dIndex) => (
-                      <div
-                        key={dIndex}
-                        className="relative border rounded-xl p-3 w-[270px] h-[241px] shadow"
-                      >
-                        <button
+                  <button
+                    onClick={() => setShowCategoryModal(true)}
+                    className="bg-red-500 w-9 h-9 rounded-full flex justify-center items-center text-white"
+                  >
+                    <Plus />
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid gap-8">
+                {(showAllDishes
+                  ? newCategories
+                  : [newCategories[activeCategoryIndex]]
+                )
+                  .filter(Boolean)
+                  .map((cat, i) => (
+                    <div key={i} className="bg-white p-6 border rounded-xl">
+                      <h2 className="text-lg font-semibold mb-4">
+                        {cat.categoryName} ({cat.dishes?.length || 0})
+                      </h2>
+
+                      <div className="grid grid-cols-4 gap-5">
+                        <div
                           onClick={() => {
-                            setSelectedDish({
-                              ...dish,
-                              catIndex: i,
-                              dishIndex: dIndex,
-                            });
-                            setShowEditModal(true);
+                            setActiveCategoryIndex(i);
+                            setShowDishModal(true);
                           }}
-                          className="absolute top-25 right-6 bg-white  cursor-pointer rounded-full w-9 h-9 flex justify-center items-center"
+                          className="border-2 border-dashed border-red-500 rounded-xl w-[270px] h-[241px] flex justify-center items-center hover:bg-red-50 cursor-pointer"
                         >
-                          <InfoIconPencil className="w-5 h-5 stroke-red-500" />
-                        </button>
-
-                        <img
-                          src={dish.image}
-                          className="h-[129px] w-full rounded-lg object-cover"
-                        />
-
-                        <div className="flex justify-between mt-2">
-                          <p className="text-red-500 font-semibold">
-                            {dish.foodName}
-                          </p>
-                          <p className="font-bold">${dish.price}</p>
+                          <button className="bg-red-500 w-9 cursor-pointer h-9 rounded-full flex justify-center items-center text-white">
+                            <Plus />
+                          </button>
                         </div>
 
-                        <p className="text-xs text-gray-500 line-clamp-3">
-                          {dish.ingredients}
-                        </p>
+                        {cat.dishes?.map((dish, dIndex) => (
+                          <div
+                            key={dIndex}
+                            className="relative border rounded-xl p-3 w-[270px] h-[241px] shadow"
+                          >
+                            <button
+                              onClick={() => {
+                                setSelectedDish({
+                                  ...dish,
+                                  catIndex: i,
+                                  dishIndex: dIndex,
+                                });
+                                setShowEditModal(true);
+                              }}
+                              className="absolute top-25 right-6 bg-white  cursor-pointer rounded-full w-9 h-9 flex justify-center items-center"
+                            >
+                              <InfoIconPencil className="w-5 h-5 stroke-red-500" />
+                            </button>
+
+                            <img
+                              src={dish.image}
+                              className="h-[129px] w-full rounded-lg object-cover"
+                            />
+
+                            <div className="flex justify-between mt-2">
+                              <p className="text-red-500 font-semibold">
+                                {dish.foodName}
+                              </p>
+                              <p className="font-bold">${dish.price}</p>
+                            </div>
+
+                            <p className="text-xs text-gray-500 line-clamp-3">
+                              {dish.ingredients}
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                    </div>
+                  ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
+      {activeTab === "OrderMenu" && (
+        <OrdersPage activeTab={activeTab} setActiveTab={setActiveTab} />
+      )}
     </>
   );
 }

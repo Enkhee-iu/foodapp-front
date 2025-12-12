@@ -28,7 +28,7 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
     }
 
     try {
-      await axios.post("http://localhost:999/api/orders", {
+      await axios.post("https://foodapp-back-k58d.onrender.com/api/orders", {
         userId: user.id,
         items: cart,
         totalPrice: itemsTotal + shippingFee,
@@ -48,7 +48,9 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
 
   const getCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:999/api/categories");
+      const res = await axios.get(
+        "https://foodapp-back-k58d.onrender.com/api/categories"
+      );
       setCategories(res.data);
     } catch (err) {
       console.log("Error loading categories:", err);
@@ -57,7 +59,9 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get("http://localhost:999/api/orders");
+      const res = await axios.get(
+        "https://foodapp-back-k58d.onrender.com/api/orders"
+      );
       console.log("ORDERS API RESPONSE ===>", res.data);
       setOrders(res.data.data);
     } catch (err) {
