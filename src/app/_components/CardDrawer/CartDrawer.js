@@ -2,7 +2,6 @@
 import { useState } from "react";
 import OrderDetail from "@/app/_icons/Orderdetail";
 import CartOrder from "./CartOrder";
-import toast from "react-hot-toast";
 
 export default function CartDrawer({
   isOpen,
@@ -11,15 +10,11 @@ export default function CartDrawer({
   onUpdateQty,
   onRemoveItem,
   onClearCart,
+  onCheckout,
+  orders,
 }) {
   const [activeTab, setActiveTab] = useState("cart");
-  const [orders, setOrders] = useState([]);
-
-  const fetchOrders = async () => {
-    const res = await fetch("http://localhost:999/api/orders");
-    const json = await res.json();
-    setOrders(json.data ?? json);
-  };
+  const [address, setAddress] = useState("");
 
   const shippingFee = 0.99;
   const itemsTotal = cartItems.reduce(
@@ -27,41 +22,6 @@ export default function CartDrawer({
     0
   );
   const totalPrice = (itemsTotal + shippingFee).toFixed(2);
-
-  const handleCheckout = async () => {
-    if (cartItems.length === 0) return;
-
-    const orderData = {
-      user: "64f123abc123abc123abc123",
-      foodOrderItems: cartItems.map((item) => ({
-        food: item.id,
-        quantity: item.quantity,
-      })),
-      totalPrice: Number(totalPrice),
-    };
-
-    try {
-      const res = await fetch("http://localhost:999/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-      });
-
-      if (!res.ok) {
-        toast.error("Checkout failed");
-        return;
-      }
-
-      await fetchOrders();
-      onClearCart();
-      setActiveTab("orders");
-
-      toast.success("Order placed successfully!"); // 🎉 ЭНД
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong");
-    }
-  };
 
   return (
     <div
@@ -182,6 +142,8 @@ export default function CartDrawer({
                   Delivery location
                 </p>
                 <input
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   placeholder="Please share your complete address"
                   className="w-full h-20 border rounded-xl text-sm p-3"
                   type="text"
@@ -206,7 +168,7 @@ export default function CartDrawer({
               </div>
 
               <button
-                onClick={handleCheckout}
+                onClick={() => onCheckout(address)}
                 className="w-full py-3 bg-[#EF4444] text-white rounded-full text-lg"
               >
                 Checkout

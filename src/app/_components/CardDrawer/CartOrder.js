@@ -55,6 +55,14 @@ export default function CartOrder({ orders }) {
             {new Date(order.createdAt).toLocaleDateString()}
           </div>
 
+          {/* Address */}
+          {order.address && (
+            <div className="flex items-center gap-2 text-gray-500 text-sm">
+              <span>📍</span>
+              <span>{order.address}</span>
+            </div>
+          )}
+
           {index !== orders.length - 1 && <hr className="my-6 border-dashed" />}
         </div>
       ))}
