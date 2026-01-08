@@ -52,15 +52,6 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
     }
   }, []);
 
-  const fetchOrders = async () => {
-    try {
-      const res = await axios.get("/api/orders");
-      setOrders(res.data.data);
-    } catch (err) {
-      console.log("Order fetch error:", err);
-    }
-  };
-
   useEffect(() => {
     const getCategories = async () => {
       try {
@@ -73,7 +64,6 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
       }
     };
     getCategories();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchOrders();
   }, []);
 
@@ -153,7 +143,6 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
 
   useEffect(() => {
     if (user) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchOrders();
     }
   }, [user]);
