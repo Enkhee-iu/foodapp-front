@@ -27,16 +27,15 @@ export default function Order() {
   const [activeTab, setActiveTab] = useState("FoodMenu");
   const [newCategories, setNewCategories] = useState([]);
 
-  const getCategories = async () => {
-    try {
-      const res = await axios.get("http://localhost:999/api/categories");
-      setNewCategories(res.data);
-    } catch (err) {
-      console.log("Error loading categories:", err);
-    }
-  };
-
   useEffect(() => {
+    const getCategories = async () => {
+      try {
+        const res = await axios.get("http://localhost:999/api/categories");
+        setNewCategories(res.data);
+      } catch (err) {
+        console.log("Error loading categories:", err);
+      }
+    };
     getCategories();
   }, []);
 

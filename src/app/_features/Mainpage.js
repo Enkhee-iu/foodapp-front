@@ -31,6 +31,7 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCart(JSON.parse(savedCart));
     }
   }, []);
@@ -46,23 +47,33 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUser(JSON.parse(storedUser));
     }
   }, []);
 
-  const getCategories = async () => {
+  const fetchOrders = async () => {
     try {
-      const res = await axios.get(
-        "https://foodapp-back-k58d.onrender.com/api/categories"
-      );
-      setCategories(res.data);
+      const res = await axios.get("/api/orders");
+      setOrders(res.data.data);
     } catch (err) {
-      console.log("Category load error:", err);
+      console.log("Order fetch error:", err);
     }
   };
 
   useEffect(() => {
+    const getCategories = async () => {
+      try {
+        const res = await axios.get(
+          "https://foodapp-back-k58d.onrender.com/api/categories"
+        );
+        setCategories(res.data);
+      } catch (err) {
+        console.log("Category load error:", err);
+      }
+    };
     getCategories();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchOrders();
   }, []);
 
@@ -139,17 +150,10 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
     }
   };
 
-  const fetchOrders = async () => {
-    try {
-      const res = await axios.get("/api/orders");
-      setOrders(res.data.data);
-    } catch (err) {
-      console.log("Order fetch error:", err);
-    }
-  };
 
   useEffect(() => {
     if (user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchOrders();
     }
   }, [user]);
@@ -242,8 +246,7 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
             setCart([]);
             localStorage.setItem("cart", "[]");
 
-            setIsCartOpen(false);
-            localStorage.setItem("isCartOpen", "false");
+            closeCart();
 
             router.push("/");
           }}
