@@ -119,7 +119,7 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (address) => {
     if (!user) return;
     if (cart.length === 0) return;
 
@@ -128,6 +128,7 @@ export default function MainPage({ isCartOpen, openCart, closeCart }) {
         items: cart,
         totalPrice: itemsTotal + shippingFee,
         status: "pending",
+        address: address,
       });
 
       setCart([]);
