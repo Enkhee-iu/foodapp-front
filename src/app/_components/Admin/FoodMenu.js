@@ -29,7 +29,7 @@ export default function Order() {
 
   const getCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:999/api/categories");
+      const res = await axios.get("https://foodapp-back-k58d.onrender.com/api/categories");
       setNewCategories(res.data);
     } catch (err) {
       console.log("Error loading categories:", err);
@@ -43,7 +43,7 @@ export default function Order() {
   const handleAddCategory = async () => {
     if (!newCategory.trim()) return;
 
-    const res = await axios.post("http://localhost:999/api/categories", {
+    const res = await axios.post("https://foodapp-back-k58d.onrender.com/api/categories", {
       categoryName: newCategory.trim(),
     });
 
@@ -65,7 +65,7 @@ export default function Order() {
   const handleDeleteCategory = async (index) => {
     const categoryId = newCategories[index]._id;
     try {
-      await axios.delete(`http://localhost:999/api/categories/${categoryId}`);
+      await axios.delete(`https://foodapp-back-k58d.onrender.com/api/categories/${categoryId}`);
       setNewCategories(newCategories.filter((_, i) => i !== index));
       if (activeCategoryIndex === index) setActiveCategoryIndex(null);
     } catch (err) {
@@ -79,7 +79,7 @@ export default function Order() {
     try {
       const categoryId = newCategories[activeCategoryIndex]._id;
 
-      const dishRes = await axios.post("http://localhost:999/api/foods", {
+      const dishRes = await axios.post("https://foodapp-back-k58d.onrender.com/api/foods", {
         foodName: newDish.name,
         price: newDish.price,
         ingredients: newDish.ingredients,
@@ -115,7 +115,7 @@ export default function Order() {
     try {
       const dishId = newCategories[catIndex].dishes[dishIndex]._id;
 
-      await axios.delete(`http://localhost:999/api/foods/${dishId}`);
+      await axios.delete(`https://foodapp-back-k58d.onrender.com/api/foods/${dishId}`);
 
       const updated = [...newCategories];
       updated[catIndex].dishes = updated[catIndex].dishes.filter(
