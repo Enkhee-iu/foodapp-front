@@ -29,7 +29,7 @@ export default function Order() {
 
   const getCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:999/api/categories");
+      const res = await axios.get("https://foodapp-back-k58d.onrender.com/api/categories");
       setNewCategories(res.data);
     } catch (err) {
       console.log("Error loading categories:", err);
@@ -65,7 +65,7 @@ export default function Order() {
   const handleDeleteCategory = async (index) => {
     const categoryId = newCategories[index]._id;
     try {
-      await axios.delete(`http://localhost:999/api/categories/${categoryId}`);
+      await axios.delete(`https://foodapp-back-k58d.onrender.com/api/categories/${categoryId}`);
       setNewCategories(newCategories.filter((_, i) => i !== index));
       if (activeCategoryIndex === index) setActiveCategoryIndex(null);
     } catch (err) {
