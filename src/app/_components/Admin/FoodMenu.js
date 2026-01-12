@@ -43,7 +43,7 @@ export default function Order() {
   const handleAddCategory = async () => {
     if (!newCategory.trim()) return;
 
-    const res = await axios.post("http://localhost:999/api/categories", {
+    const res = await axios.post("https://foodapp-back-k58d.onrender.com/api/categories", {
       categoryName: newCategory.trim(),
     });
 
@@ -79,7 +79,7 @@ export default function Order() {
     try {
       const categoryId = newCategories[activeCategoryIndex]._id;
 
-      const dishRes = await axios.post("http://localhost:999/api/foods", {
+      const dishRes = await axios.post("https://foodapp-back-k58d.onrender.com/api/foods", {
         foodName: newDish.name,
         price: newDish.price,
         ingredients: newDish.ingredients,
@@ -115,7 +115,7 @@ export default function Order() {
     try {
       const dishId = newCategories[catIndex].dishes[dishIndex]._id;
 
-      await axios.delete(`http://localhost:999/api/foods/${dishId}`);
+      await axios.delete(`https://foodapp-back-k58d.onrender.com/api/foods/${dishId}`);
 
       const updated = [...newCategories];
       updated[catIndex].dishes = updated[catIndex].dishes.filter(
